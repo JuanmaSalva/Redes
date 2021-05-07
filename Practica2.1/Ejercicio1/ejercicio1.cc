@@ -8,13 +8,13 @@
 
 int main(int argc, char** argv) //argv[1] direccion, argv[2] protocolo
 {
-   struct addrinfo hintsInfo;
+    struct addrinfo hintsInfo;
     struct addrinfo * resInfo;
 
     memset((void*) &hintsInfo, 0, sizeof(struct addrinfo));
 
-    hintsInfo.ai_family = AF_UNSPEC; //le decimos que tiene que ser ipv4
-    hintsInfo.ai_socktype = 0; //tcp
+    hintsInfo.ai_family = AF_UNSPEC; //cualquier tipo de ip (Ipv4 o IPv6)
+    hintsInfo.ai_socktype = 0; //todos los protocolos
 
     //hacemos la llamada por red
     int info = getaddrinfo(argv[1], argv[2], &hintsInfo, &resInfo);
