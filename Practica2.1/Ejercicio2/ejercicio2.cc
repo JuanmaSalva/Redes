@@ -9,7 +9,7 @@
  #include <time.h>
  
 
-int hora(int socket_, sockaddr client, socklen_t client_len){
+int resp(const char *comando, int socket_, sockaddr client, socklen_t client_len){
     char bufferOut[50] = {};
     time_t t;
     struct tm * timeInfo;
@@ -17,11 +17,11 @@ int hora(int socket_, sockaddr client, socklen_t client_len){
     t = time(NULL);
     timeInfo = localtime(&t);
 
-    const char *aux = "%T";
-    strftime(bufferOut, sizeof(bufferOut), aux, timeInfo);
+    //const char *aux = "%T";
+    strftime(bufferOut, sizeof(bufferOut), comando, timeInfo);
 
 
-    std::cout << "La hora es: " << bufferOut << "\n";
+    std::cout << "Respuesta mandada\n";
     return sendto(socket_, bufferOut, sizeof(bufferOut), 0, &client, client_len);
 }
 
@@ -83,10 +83,10 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
 
         switch(buffer[0]){
                 case 't':
-                bytesSend = hora(socket_, client, client_len);                
+                bytesSend = resp("%T", socket_, client, client_len);                
             break;
                 case 'd':
-                bytesSend = sendto(socket_, buffer, bytes, 0, &client, client_len);
+                bytesSend = resp("%D", socket_, client, client_len); 
             break;
                 case 'q':
                 serverEncendido = false;
