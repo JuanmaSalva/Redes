@@ -6,6 +6,26 @@
 
 #include <iostream>
 
+ #include <time.h>
+ 
+
+int hora(int socket_, sockaddr client, socklen_t client_len){
+    char bufferOut[50] = {};
+    time_t t;
+    struct tm * timeInfo;
+
+    t = time(NULL);
+    timeInfo = localtime(&t);
+
+    const char *aux = "%T";
+    strftime(bufferOut, sizeof(bufferOut), aux, timeInfo);
+
+
+    std::cout << "La hora es: " << bufferOut << "\n";
+    return sendto(socket_, bufferOut, sizeof(bufferOut), 0, &client, client_len);
+}
+
+
 
 int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puerto
 {
@@ -38,7 +58,8 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
 
     freeaddrinfo(resInfo);
 
-    while(true){
+    bool serverEncendido = true;
+    while(serverEncendido){
         char buffer[50];
 
         char host[NI_MAXHOST];
@@ -47,21 +68,38 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
         struct sockaddr client;
         socklen_t client_len = sizeof(struct sockaddr);
 
-        std::cout << "Esperando mensaje\n";
         //cargamos el mensaje guardando la cantidad de bytes que se han mandado
+        //std::cout << "Esperando\n";
         int bytes = recvfrom(socket_, buffer, 50, 0, &client, &client_len);
 
         if(bytes == -1){
+            std::cout << "Se ha producido un error al recibir el mensaje\n";
             return -1;
         }
 
-        /*getnameinfo(&client, client_len,
-                       host, NI_MAXHOST,
-                       service, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);*/
+        std::cout << "Comando: " << buffer[0] << "\n";
 
-        std::cout << "Mensaje: " << buffer << "\n";
+        int bytesSend = 0;
 
-        /*int bytesSend = */sendto(socket_, buffer, bytes, 0, &client, client_len);
+        switch(buffer[0]){
+                case 't':
+                bytesSend = hora(socket_, client, client_len);                
+            break;
+                case 'd':
+                bytesSend = sendto(socket_, buffer, bytes, 0, &client, client_len);
+            break;
+                case 'q':
+                serverEncendido = false;
+            break;
+                default:
+                std::cout << "Comando incorrecto\n";
+            break;
+        }
+
+        if(bytesSend == -1){
+            std::cout << "Se ha producido un error al enviar la respuesta\n";
+            return -1;
+        }
     }
 
     close(socket_);
