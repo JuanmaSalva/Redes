@@ -46,19 +46,19 @@ int main(int argc, char** argv) //argv[1] direccion, argv[2] puerti, argv[3] com
 
     freeaddrinfo(resInfo);
 
-    //bind(socket_, resInfo->ai_addr, resInfo->ai_addrlen);
+    bind(socket_, resInfo->ai_addr, resInfo->ai_addrlen);
 
     char buffer[50];
     struct sockaddr client;
     socklen_t client_len = sizeof(struct sockaddr);
 
     //sendto
-    //sendto(socket_, argv[3], sizeof(argv[3]),0, &client, client_len);
-    write(socket_, argv[3], sizeof(argv[3]));
+    sendto(socket_, argv[3], sizeof(argv[3]),0, NULL, 0);
+    //write(socket_, argv[3], sizeof(argv[3]));
 
     //recivefrom
-    //int bytes = recvfrom(socket_, buffer, sizeof(buffer), 0, &client, &client_len);
-    int bytes = read(socket_, buffer, 50);
+    int bytes = recvfrom(socket_, buffer, sizeof(buffer), 0, &client, &client_len);
+    //int bytes = read(socket_, buffer, 50);
 
     if(bytes == -1){
         std::cout << "Se ha producido un error al recibir los datos\n";

@@ -25,7 +25,11 @@ int resp(const char *comando, int socket_, sockaddr client, socklen_t client_len
     return sendto(socket_, bufferOut, sizeof(bufferOut), 0, &client, client_len);
 }
 
+int conexionTerminada(int socket_, sockaddr client, socklen_t client_len){
+    const char msg[50] = {"Server cerrado"};
 
+    return sendto(socket_, msg, sizeof(msg), 0, &client, client_len);
+}
 
 int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puerto
 {
@@ -90,6 +94,7 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
             break;
                 case 'q':
                 serverEncendido = false;
+                bytesSend = conexionTerminada(socket_, client, client_len);
             break;
                 default:
                 std::cout << "Comando incorrecto\n";
