@@ -39,7 +39,7 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
     memset((void*) &hintsInfo, 0, sizeof(struct addrinfo));
 
     hintsInfo.ai_family = AF_INET; //le decimos que tiene que ser ipv4
-    hintsInfo.ai_socktype = SOCK_DGRAM; //udp
+    hintsInfo.ai_socktype = SOCK_STREAM; //tcp
 
     //hacemos la llamada por red
     int info = getaddrinfo(argv[1], argv[2], &hintsInfo, &resInfo);
@@ -62,53 +62,43 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
 
     freeaddrinfo(resInfo);
 
+
+
+    listen(socket_, 16); //16 concexiones posibles
+
+    char host[NI_MAXHOST];
+    char service[NI_MAXSERV];
+
+
+    struct sockaddr client;
+    socklen_t client_len = sizeof(struct sockaddr);
+    int client_socket = accept(socket_, &client, &client_len); //este es el socket q específico a esa conexión
+
+    getnameinfo(&client, client_len, host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+    std::cout << "Conexión desde: " << host << ":" << service << "\n";
+
+    
     bool serverEncendido = true;
     while(serverEncendido){
         char buffer[50];
 
-        char host[NI_MAXHOST];
-        char service[NI_MAXSERV];
-
-        struct sockaddr client;
-        socklen_t client_len = sizeof(struct sockaddr);
-
-        getnameinfo(&client, client_len, host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-        std::cout << "Conexión desde: " << host << ":" << service << "\n";
-
         //cargamos el mensaje guardando la cantidad de bytes que se han mandado
         //std::cout << "Esperando\n";
-        int bytes = recvfrom(socket_, buffer, 50, 0, &client, &client_len);
+        int bytes = recv(client_socket, buffer, 50, 0);
+
+        if(bytes == 0){ //el cliente ha terminado la conexión
+            serverEncendido = false; //en verdad esto no hace falta
+            std::cout << "Servidor cerrado\n";
+            break;
+        }
 
         if(bytes == -1){
             std::cout << "Se ha producido un error al recibir el mensaje\n";
             return -1;
         }
 
-        //std::cout << bytes << " bytes de " << client << "\n";
-        std::cout << "Comando: " << buffer[0] << "\n";
-
-        int bytesSend = 0;
-
-        switch(buffer[0]){
-                case 't':
-                bytesSend = resp("%T", socket_, client, client_len);                
-            break;
-                case 'd':
-                bytesSend = resp("%D", socket_, client, client_len); 
-            break;
-                case 'q':
-                serverEncendido = false;
-                bytesSend = conexionTerminada(socket_, client, client_len);
-            break;
-                default:
-                std::cout << "Comando incorrecto\n";
-            break;
-        }
-
-        if(bytesSend == -1){
-            std::cout << "Se ha producido un error al enviar la respuesta\n";
-            return -1;
-        }
+        
+        send(client_socket, buffer, bytes, 0);
     }
 
     close(socket_);
