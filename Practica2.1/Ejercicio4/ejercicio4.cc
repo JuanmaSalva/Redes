@@ -96,7 +96,7 @@ int main(int argc, char** argv) //argv[1] direccion donde escucha, argv[2] puert
             std::cout << "Se ha producido un error al recibir el mensaje\n";
             return -1;
         }
-
+        std::cout << "Mensaje recibido\n";
         
         send(client_socket, buffer, bytes, 0);
     }

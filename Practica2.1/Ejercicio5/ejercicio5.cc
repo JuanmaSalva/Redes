@@ -15,7 +15,7 @@ int main(int argc, char** argv) //argv[1] direccion, argv[2] puerti, argv[3] com
     memset((void*) &hintsInfo, 0, sizeof(struct addrinfo));
 
     hintsInfo.ai_family = AF_INET; //le decimos que tiene que ser ipv4
-    hintsInfo.ai_socktype = SOCK_DGRAM; //upd
+    hintsInfo.ai_socktype = SOCK_STREAM; //tcp
 
     //hacemos la llamada por red
     int info = getaddrinfo(argv[1], argv[2], &hintsInfo, &resInfo);
@@ -48,24 +48,45 @@ int main(int argc, char** argv) //argv[1] direccion, argv[2] puerti, argv[3] com
 
     bind(socket_, resInfo->ai_addr, resInfo->ai_addrlen);
 
-    char buffer[50];
-    struct sockaddr client;
-    socklen_t client_len = sizeof(struct sockaddr);
+    while(true){
+        char msg[50];
+        std::cin >> msg;
 
+        if(msg[0] == 'Q'){
+            char vacio = ' ';
+            send(socket_, &vacio, sizeof(vacio),0);
+            break;
+        }
+
+
+
+        send(socket_, &msg, sizeof(msg),0);
+
+        char buffer[50] = {};
+        int bytes = recv(socket_, buffer, sizeof(buffer),0);
+        if(bytes == 0){
+            std::cout << "Conexión terminada\n";
+            break;
+        }
+        if(bytes == -1){
+            std::cout << "Se ha producido un error al recibir el mensaje\n";
+            return -1;
+        }
+
+        std::cout << buffer << "\n";
+    }
     //sendto
-    sendto(socket_, argv[3], sizeof(argv[3]),0, NULL, 0);
+    //sendto(socket_, argv[3], sizeof(argv[3]),0, NULL, 0);
     //write(socket_, argv[3], sizeof(argv[3]));
 
     //recivefrom
-    int bytes = recvfrom(socket_, buffer, sizeof(buffer), 0, &client, &client_len);
+    //int bytes = recvfrom(socket_, buffer, sizeof(buffer), 0, &client, &client_len);
     //int bytes = read(socket_, buffer, 50);
 
-    if(bytes == -1){
+    /*if(bytes == -1){
         std::cout << "Se ha producido un error al recibir los datos\n";
         return -1;
-    }
-
-    std::cout << buffer << "\n";
+    }*/
 
     return 0; 
 }
