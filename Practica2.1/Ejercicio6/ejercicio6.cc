@@ -8,6 +8,7 @@
 #include <thread> 
 
 #include "mensaje.cc"
+#include <time.h>
 
 #define MAX_THREADS 5
 
