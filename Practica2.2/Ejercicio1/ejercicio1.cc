@@ -29,17 +29,17 @@ public:
         char* aux = _data;
 
         //en _data tenemos que meter todo los datos de la clase
-        memcpy(aux, name, 80 * sizeof(char));
+        memcpy(aux, name, (80 * sizeof(char)));
 
         //para no sobre-escribir lo que ya tenemos, avanzamos 
         aux += (80 * sizeof(char));
 
         //copiamos la x y la y
-        memcpy(aux,&x, sizeof(int16_t));
+        memcpy(aux, &x, sizeof(int16_t));
         aux += sizeof(int16_t);
 
         memcpy(aux, &y, sizeof(int16_t));
-        aux += sizeof(int16_t);
+        aux += sizeof(int16_t);   
     }
 
     int from_bin(char * data)
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
     int file = open("./jugador", O_CREAT | O_TRUNC | O_RDWR, 0666);
     //escribimos los datos
     char* data = one_w.getData();
-    write(file, data, sizeof(data));
+    write(file, data, one_w.getMaxSize());
 
     //cerramos el archivo
     if(close(file) != 0)
@@ -116,16 +116,11 @@ int main(int argc, char **argv)
     // 3. Leer el fichero
     file = open("./jugador", O_RDONLY);
 
-
-
     char* buffIn = (char*)malloc(one_r.getMaxSize());
     read(file, buffIn, one_r.getMaxSize());
     //cerramos el archivo
     if(close(file) != 0)
             std::cout << "Se ha producido un error al cerrar el fichero\n";
-
-    
-    one_r.printVal();
 
     // 4. "Deserializar" en one_r
     one_r.from_bin(buffIn);
