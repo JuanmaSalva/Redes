@@ -25,7 +25,6 @@ public:
         //primero reservamos espacio suficiente para todos los datos
         allocData();
 
-        std::cout << _size << "\n";
         //se crea una copia para poderlo avanzar
         char* aux = _data;
 
@@ -99,38 +98,37 @@ int main(int argc, char **argv)
     Jugador one_w("Player_ONE", 123, 987);
 
     // 1. Serializar el objeto one_w
-    std::cout << "Hemos nada\n";
     one_w.to_bin();
-    std::cout << "Hemos otro\n";
 
     // 2. Escribir la serialización en un fichero
 
     //abrimos el archivo
-    int file = open("./jugador", O_CREAT | O_TRUNC | O_RDWR);
+    int file = open("./jugador", O_CREAT | O_TRUNC | O_RDWR, 0666);
     //escribimos los datos
     char* data = one_w.getData();
-    std::cout << sizeof(data) << "\n";
     write(file, data, sizeof(data));
 
     //cerramos el archivo
     if(close(file) != 0)
         std::cout << "Se ha producido un error al cerrar el fichero\n";
 
-    std::cout << "Hemos escrito\n";
-        
+    
     // 3. Leer el fichero
-    int inFile = open("./jugador", O_TRUNC | O_RDONLY);
+    file = open("./jugador", O_RDONLY);
 
-    char* inData;
-    read(inFile, inData, one_r.getMaxSize());
+
+
+    char* buffIn = (char*)malloc(one_r.getMaxSize());
+    read(file, buffIn, one_r.getMaxSize());
     //cerramos el archivo
-    if(close(inFile) != 0)
+    if(close(file) != 0)
             std::cout << "Se ha producido un error al cerrar el fichero\n";
 
     
-    std::cout << "Hemos leido\n";
+    one_r.printVal();
+
     // 4. "Deserializar" en one_r
-    one_r.from_bin(inData);
+    one_r.from_bin(buffIn);
 
     // 5. Mostrar el contenido de one_r
     one_r.printVal();
