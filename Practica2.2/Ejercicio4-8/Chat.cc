@@ -10,6 +10,19 @@ void ChatMessage::to_bin()
     memset(_data, 0, MESSAGE_SIZE);
 
     //Serializar los campos type, nick y message en el buffer _data
+    char* aux = _data;
+
+    //guardamos el tipo
+    memcpy(aux, &type, sizeof(uint8_t));
+    aux += sizeof(uint8_t);
+
+    //guardamos el nombre
+    memcpy(aux, nick.c_str(), sizeof(char) * 8);
+    aux += sizeof(char) * 8;
+
+    //guardamos el mensaje
+    memcpy(aux, message.c_str(), sizeof(char) * 80);
+
 }
 
 int ChatMessage::from_bin(char * bobj)
@@ -19,6 +32,18 @@ int ChatMessage::from_bin(char * bobj)
     memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
 
     //Reconstruir la clase usando el buffer _data
+    char* aux = _data;
+    memcpy(&type, aux, sizeof(uint8_t));
+    aux += sizeof(uint8_t);
+
+    char* nickChar;
+    memcpy(nickChar, _data, sizeof(char) * 8);
+    nick = std::string(nickChar);
+    aux += sizeof(char) * 8;
+
+    char* msgChar;
+    memcpy(msgChar, _data, sizeof(char) * 80);
+    message = std::string(msgChar);
 
     return 0;
 }

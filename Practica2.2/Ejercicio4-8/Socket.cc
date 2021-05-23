@@ -81,9 +81,9 @@ bool operator== (const Socket &s1, const Socket &s2)
     const struct sockaddr_in* b = (const struct sockaddr_in*)&s2.sa;
     
 
-    //Comparar los campos sin_family, sin_addr.s_addr y sin_port
+    //Complos campos sin_family, sin_addr.s_addr y sin_port
     //de la estructura sockaddr_in de los Sockets s1 y s2
-    //Retornar false si alguno difiere
+    //Retornar falarar se si alguno difiere
     if(a->sin_family == b->sin_family && a->sin_addr.s_addr == b->sin_addr.s_addr && a->sin_port == b->sin_port)
      return true;
     else return false;
