@@ -5,6 +5,7 @@
 
 Socket::Socket(const char * address, const char * port):sd(-1)
 { 
+    std::cout << "Vamos a abrir el server\n";
     //Construir un socket de tipo AF_INET y SOCK_DGRAM usando getaddrinfo   
     struct addrinfo hintsInfo;
     struct addrinfo * resInfo;
@@ -30,12 +31,8 @@ Socket::Socket(const char * address, const char * port):sd(-1)
         return;
     }
 
-    //inicializamos sa y sa_len 
-    char host[NI_MAXHOST];
-    char service[NI_MAXSERV];
-
-    sa_len = sizeof(struct sockaddr);
-    getnameinfo(&sa, sa_len, host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+    sa = *resInfo->ai_addr;
+    sa_len = resInfo->ai_addrlen;
 }
 
 int Socket::recv(Serializable &obj, Socket * &sock)
@@ -45,7 +42,9 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 
     char buffer[MAX_MESSAGE_SIZE];
 
+    std::cout << "Esperando mensaje\n";
     ssize_t bytes = ::recvfrom(sd, buffer, MAX_MESSAGE_SIZE, 0, &sa, &sa_len);
+    std::cout << "Mensaje recibido\n";
 
     if ( bytes <= 0 )
     {
@@ -65,13 +64,15 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 int Socket::send(Serializable& obj, const Socket& sock)
 {
     //Serializar el objeto
+    std::cout << "Vamos a enviar un mensaje\n";
     obj.to_bin();
     
-    //todo sacar bufferout desl objeto
+    //sacar bufferout desl objeto
     char* bufferOut = obj.data();
 
     //Enviar el objeto binario a sock usando el socket sd
     sendto(sd, bufferOut, sizeof(bufferOut), 0, &sa, sa_len);
+    std::cout << "El mensaje se ha enviado\n";
 }
 
 bool operator== (const Socket &s1, const Socket &s2)
