@@ -4,8 +4,7 @@
 #include "Socket.h"
 
 Socket::Socket(const char * address, const char * port):sd(-1)
-{ 
-    std::cout << "Vamos a abrir el server\n";
+{
     //Construir un socket de tipo AF_INET y SOCK_DGRAM usando getaddrinfo   
     struct addrinfo hintsInfo;
     struct addrinfo * resInfo;
@@ -42,9 +41,7 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 
     char buffer[MAX_MESSAGE_SIZE];
 
-    std::cout << "Esperando mensaje\n";
     ssize_t bytes = ::recvfrom(sd, buffer, MAX_MESSAGE_SIZE, 0, &sa, &sa_len);
-    std::cout << "Mensaje recibido\n";
 
     if ( bytes <= 0 )
     {
@@ -64,7 +61,6 @@ int Socket::recv(Serializable &obj, Socket * &sock)
 int Socket::send(Serializable& obj, const Socket& sock)
 {
     //Serializar el objeto
-    std::cout << "Vamos a enviar un mensaje\n";
     obj.to_bin();
     
     //sacar bufferout desl objeto
@@ -72,7 +68,6 @@ int Socket::send(Serializable& obj, const Socket& sock)
 
     //Enviar el objeto binario a sock usando el socket sd
     sendto(sd, bufferOut, sizeof(bufferOut), 0, &sa, sa_len);
-    std::cout << "El mensaje se ha enviado\n";
 }
 
 bool operator== (const Socket &s1, const Socket &s2)

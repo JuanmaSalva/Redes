@@ -61,20 +61,26 @@ void ChatServer::do_messages()
          * para añadirlo al vector
          */
 
-        //Recibir Mensajes en y en función del tipo de mensaje   
-        std::cout << "Abrimos server\n";
+        //Recibir Mensajes en y en función del tipo de mensaje
         ChatMessage msg;
-        socket.recv(msg);
+        Socket *auxSock = new Socket(socket);
+        socket.recv(msg, auxSock);
+
+
 
         switch(msg.type){
             case 0:
-            std::cout << "LOGIN\n";
-            break;
+            {
+                std::cout << "LOGIN " << *auxSock << "\n";
+                std::unique_ptr<Socket> aux(auxSock);
+                clients.push_back(std::move(aux));
+                break;    
+            }    
             case 1:
-            std::cout << "LOGOUT\n";
+            std::cout << "MESSAGE " << *auxSock << "\n";
             break;
             case 2:
-            std::cout << "MESSAGE\n";            
+            std::cout << "LOGOUT " << *auxSock << "\n";          
             break;
         }
 
@@ -89,7 +95,6 @@ void ChatServer::do_messages()
 
 void ChatClient::login()
 {
-    std::cout << "LOGIN cliente\n";
     std::string msg;
 
     ChatMessage em(nick, msg);
