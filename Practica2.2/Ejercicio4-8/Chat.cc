@@ -63,7 +63,7 @@ void ChatServer::do_messages()
 
         //Recibir Mensajes en y en función del tipo de mensaje
         ChatMessage msg;
-        Socket *auxSock = new Socket(socket);
+        Socket *auxSock = &socket;
         socket.recv(msg, auxSock);
 
         switch(msg.type){
@@ -79,19 +79,17 @@ void ChatServer::do_messages()
                 std::cout << "MESSAGE " << *auxSock << "\n";
                 //mandar el mensaje a todos los clientes siempre y cuando no sea tu mismo
                 for(int i=0;i<clients.size();i++){
-                    if(!(*clients[i].get() == *auxSock)){
+                    Socket indx = *clients[i].get(); 
+                    if(!(indx == *auxSock)){
                         //mandar el mensaje al resto
-                        std::cout <<  "Reenviando mensaje\n";
-                        auxSock->send(msg, *auxSock);
+                        indx.send(msg, indx);
                     }
                 }
-
                 break;
             }
             case 2:
             {
-                std::cout << "LOGOUT " << *auxSock << "\n";          
-                
+                std::cout << "LOGOUT " << *auxSock << "\n";
                 //buscamos ese socket para eliminarlo
                 for(int i=0;i<clients.size();i++){
                     if(!(*clients[i].get() == *auxSock)){
@@ -120,9 +118,7 @@ void ChatClient::login()
     ChatMessage em(nick, msg);
     em.type = ChatMessage::LOGIN;
 
-    //std::cout << "se va a enviar los datos\n";
     socket.send(em, socket);
-    //std::cout << "se han enviado los datos\n";
 }
 
 void ChatClient::logout()
