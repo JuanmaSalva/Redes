@@ -22,6 +22,7 @@ void ChatMessage::to_bin()
 
     //guardamos el mensaje
     memcpy(aux, message.c_str(), sizeof(char) * 80);
+    aux += sizeof(char) * 80; //tecnicamente no haria falta
 
 }
 
@@ -33,17 +34,15 @@ int ChatMessage::from_bin(char * bobj)
 
     //Reconstruir la clase usando el buffer _data
     char* aux = _data;
+
     memcpy(&type, aux, sizeof(uint8_t));
     aux += sizeof(uint8_t);
 
-    char* nickChar = (char*)malloc(sizeof(char) * 8);
-    memcpy(nickChar, _data, sizeof(char) * 8);
-    nick = std::string(nickChar);
+    nick = aux;
     aux += sizeof(char) * 8;
 
-    char* msgChar = (char*)malloc(sizeof(char) * 80);
-    memcpy(msgChar, _data, sizeof(char) * 80);
-    message = std::string(msgChar);
+    message = aux;
+    aux += sizeof(char) * 80;
 
     return 0;
 }
@@ -101,10 +100,6 @@ void ChatServer::do_messages()
             }
             
         }
-
-        // - LOGIN: Añadir al vector clients
-        // - LOGOUT: Eliminar del vector clients
-        // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
     }
 }
 

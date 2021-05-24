@@ -68,12 +68,9 @@ int Socket::send(Serializable& obj, const Socket& sock)
 {
     //Serializar el objeto
     obj.to_bin();
-    
-    //sacar bufferout desl objeto
-    char* bufferOut = obj.data();
 
     //Enviar el objeto binario a sock usando el socket sd
-    sendto(sock.sd, bufferOut, sizeof(bufferOut), 0, &sa, sa_len);
+    sendto(sock.sd, obj.data(), obj.size(), 0, &sa, sa_len);
 }
 
 bool operator== (const Socket &s1, const Socket &s2)
