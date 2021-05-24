@@ -66,8 +66,6 @@ void ChatServer::do_messages()
         Socket *auxSock = new Socket(socket);
         socket.recv(msg, auxSock);
 
-
-
         switch(msg.type){
             case 0:
             {
@@ -77,11 +75,33 @@ void ChatServer::do_messages()
                 break;    
             }    
             case 1:
-            std::cout << "MESSAGE " << *auxSock << "\n";
-            break;
+            {
+                std::cout << "MESSAGE " << *auxSock << "\n";
+                //mandar el mensaje a todos los clientes siempre y cuando no sea tu mismo
+                for(int i=0;i<clients.size();i++){
+                    if(!(*clients[i].get() == *auxSock)){
+                        //mandar el mensaje al resto
+                        std::cout <<  "Reenviando mensaje\n";
+                        auxSock->send(msg, *auxSock);
+                    }
+                }
+
+                break;
+            }
             case 2:
-            std::cout << "LOGOUT " << *auxSock << "\n";          
-            break;
+            {
+                std::cout << "LOGOUT " << *auxSock << "\n";          
+                
+                //buscamos ese socket para eliminarlo
+                for(int i=0;i<clients.size();i++){
+                    if(!(*clients[i].get() == *auxSock)){
+                        clients.erase(clients.begin() + i);
+                        break;
+                    }
+                }
+                break;
+            }
+            
         }
 
         // - LOGIN: Añadir al vector clients

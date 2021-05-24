@@ -75,7 +75,6 @@ bool operator== (const Socket &s1, const Socket &s2)
     //en memoria un sockaddr_in es lo mismo que un sockaddr
     const struct sockaddr_in* a = (const struct sockaddr_in*)&s1.sa;
     const struct sockaddr_in* b = (const struct sockaddr_in*)&s2.sa;
-    
 
     //Complos campos sin_family, sin_addr.s_addr y sin_port
     //de la estructura sockaddr_in de los Sockets s1 y s2
