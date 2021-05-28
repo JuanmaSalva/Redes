@@ -136,15 +136,13 @@ void ChatClient::input_thread()
         std::getline (std::cin,msg);
 
         // Enviar al servidor usando socket
-        ChatMessage em;
+        ChatMessage em = ChatMessage(nick, msg);
                 
         if(msg == "quit"){ //mandamos el logOut
-            em = ChatMessage(nick, "");
             em.type = ChatMessage::LOGOUT;
             activo = false;
         }
-        else { //mandamos un mensaje normal
-            em = ChatMessage(nick, msg);
+        else { //mandamos un mensaje normal            
             em.type = ChatMessage::MESSAGE;
         }
         socket.send(em, socket);
@@ -160,8 +158,7 @@ void ChatClient::net_thread()
         socket.recv(msg);
 
         //std::cout << "Mensaje recibido\n";
-        if(msg.message != "quit")        
-            //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
+        if(msg.message != "quit")
             std::cout << msg.nick << ": " << msg.message << "\n";
     }
 }
